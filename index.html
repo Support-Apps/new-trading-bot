@@ -205,11 +205,11 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
   </div>
 
   <div class="cd setup rv d1" id="setup">
-    <div class="cd-t">🔑 התחברות</div>
-    <p>לחצי <b>"התחבר"</b> לקבלת מחיר זהב חי. הבוט מתחבר אוטומטית.<br>
-    <b>אופציונלי:</b> מפתח מ-<a href="https://www.goldapi.io" target="_blank">goldapi.io</a> (חינם) לדיוק נוסף.</p>
+    <div class="cd-t">🔌 התחברות</div>
+    <p>הכניסי את המפתח מ-<a href="https://www.goldapi.io" target="_blank">goldapi.io</a> (חינם, 100 בקשות/חודש).<br>
+    הבוט משתמש בו לבקשה ראשונה בלבד, ואז עובר ל-Swissquote (חינם, ללא הגבלה) לעדכונים שוטפים.</p>
     <div class="inp-row">
-      <input class="inp" id="keyInp" placeholder="אופציונלי — goldapi-XXXX-io" dir="ltr">
+      <input class="inp" id="keyInp" placeholder="goldapi-XXXX-io" dir="ltr">
       <button class="btn-gold" onclick="connect()">התחבר</button>
     </div>
     <div class="api-st" id="apiSt"></div>
@@ -303,7 +303,7 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 const $=id=>document.getElementById(id);
 const S={key:'',prices:[],px:null,op:null,bid:null,ask:null,hi:null,lo:null,
   alerts:true,push:false,aggro:false,scans:0,sigs:[],lastSig:null,lastSigT:0,
-  live:false,chart:[],iv:null,_ch:null,_chp:null,
+  live:false,chart:[],iv:null,_ch:null,_chp:null,lastGoldApiCall:0,
   dxy:{price:null,ch:null},oil:{price:null,ch:null},
   newsScore:0, // -2 to +2
   corrScore:0 // -2 to +2
@@ -321,9 +321,33 @@ function tAggro(){S.aggro=!S.aggro;$('bAggro').classList.toggle('on');$('bAggro'
 // ===== FETCH PRICES =====
 async function fetchGold(){
   const sources=[
-    {n:'gold-api.com',fn:async()=>{const r=await fetch('https://api.gold-api.com/price/XAU',{signal:AbortSignal.timeout(6000)});if(!r.ok)throw 0;const d=await r.json();if(!d.price||d.price<1000||d.price>10000)throw 0;S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.highPrice||d.high||S.hi;S.lo=d.lowPrice||d.low||S.lo;return{p:Math.round(d.price*100)/100,s:'gold-api.com'};}},
-    {n:'goldapi.io',fn:async()=>{if(!S.key)throw 0;const r=await fetch('https://www.goldapi.io/api/XAU/USD',{headers:{'x-access-token':S.key,'Content-Type':'application/json'},signal:AbortSignal.timeout(8000)});if(!r.ok)throw 0;const d=await r.json();if(d.error||!d.price)throw 0;S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.high_price||S.hi;S.lo=d.low_price||S.lo;if(d.open_price&&!S.op)S.op=d.open_price;if(d.ch!==undefined)S._ch=d.ch;if(d.chp!==undefined)S._chp=d.chp;return{p:Math.round(d.price*100)/100,s:'goldapi.io'};}},
-    {n:'Swissquote',fn:async()=>{const r=await fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw 0;const d=await r.json();const p=d?.[0]?.spreadProfilePrices?.[0];if(!p)throw 0;const px=(p.ask+p.bid)/2;S.bid=p.bid;S.ask=p.ask;return{p:Math.round(px*100)/100,s:'Swissquote'};}}
+    // Source 1: goldapi.io (needs key, 100/month, but accurate + CORS works)
+    {n:'goldapi.io',fn:async()=>{
+      if(!S.key)throw 0;
+      // Only use goldapi.io sparingly — max once per 5 min
+      if(S.lastGoldApiCall && Date.now()-S.lastGoldApiCall<300000)throw 0;
+      const r=await fetch('https://www.goldapi.io/api/XAU/USD',{headers:{'x-access-token':S.key,'Content-Type':'application/json'},signal:AbortSignal.timeout(8000)});
+      if(!r.ok)throw 0;const d=await r.json();if(d.error||!d.price)throw 0;
+      S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.high_price||S.hi;S.lo=d.low_price||S.lo;
+      if(d.open_price&&!S.op)S.op=d.open_price;
+      if(d.ch!==undefined)S._ch=d.ch;if(d.chp!==undefined)S._chp=d.chp;
+      S.lastGoldApiCall=Date.now();
+      return{p:Math.round(d.price*100)/100,s:'goldapi.io'};
+    }},
+    // Source 2: Swissquote (free, unlimited, CORS works, real forex feed)
+    {n:'Swissquote',fn:async()=>{
+      const r=await fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD',{signal:AbortSignal.timeout(5000)});
+      if(!r.ok)throw 0;const d=await r.json();const p=d?.[0]?.spreadProfilePrices?.[0];if(!p)throw 0;
+      const px=(p.ask+p.bid)/2;S.bid=p.bid;S.ask=p.ask;
+      return{p:Math.round(px*100)/100,s:'Swissquote'};
+    }},
+    // Source 3: gold-api.com (free, may have CORS issues on some hosts)
+    {n:'gold-api.com',fn:async()=>{
+      const r=await fetch('https://api.gold-api.com/price/XAU',{signal:AbortSignal.timeout(6000)});
+      if(!r.ok)throw 0;const d=await r.json();if(!d.price||d.price<1000||d.price>10000)throw 0;
+      S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.highPrice||d.high||S.hi;S.lo=d.lowPrice||d.low||S.lo;
+      return{p:Math.round(d.price*100)/100,s:'gold-api.com'};
+    }}
   ];
   for(const s of sources){try{const r=await s.fn();if(!S.live){S.live=true;$('dot').className='dot on';$('stLbl').textContent='חי — '+r.s;}return r.p;}catch(e){}}
   if(S.live){S.live=false;$('dot').className='dot off';$('stLbl').textContent='חיבור נפל';}return null;
@@ -655,69 +679,49 @@ async function connect(){
   S.key=localStorage.getItem('gp5_key')||'';
   if(S.key)$('keyInp').value=S.key;
 
-  // Show demo data immediately so UI is never empty
-  loadDemo();
+  // Show empty state
+  loadPreview();
+
+  // Auto-connect if returning user with saved key
+  if(S.key){
+    await connect();
+  }
 
   $('splash').classList.add('x');
 })();
 
-function loadDemo(){
-  // Demo gold price
-  $('pMain').innerHTML='<span class="dlr">$</span>4,512.85';
-  $('pChg').textContent='+37.50 (+0.83%)';$('pChg').className='pch up';
-  $('mBid').textContent='4,512.40';$('mAsk').textContent='4,513.30';
-  $('mHi').textContent='4,538.20';$('mLo').textContent='4,471.60';
+function loadPreview(){
+  $('dot').className='dot off';
+  $('stLbl').textContent='לא מחובר — לחצי התחבר';
 
-  // Demo correlations
-  $('cGoldP').textContent='$4,512.85';
-  $('cDxyP').textContent='100.26';$('cDxyC').textContent='+0.11%';$('cDxyC').className='ci-chg up';
-  $('cDxyImp').textContent='שלילי לזהב';$('cDxyImp').className='ci-impact bearish';
-  $('cOilP').textContent='$83.40';$('cOilC').textContent='+2.1%';$('cOilC').className='ci-chg up';
-  $('cOilImp').textContent='חיובי לזהב';$('cOilImp').className='ci-impact bullish';
+  $('pMain').innerHTML='<span class="dlr">$</span>----.--';
+  $('pChg').textContent='פתחי בדפדפן ולחצי התחבר לנתונים חיים';$('pChg').style.cssText='font-family:Outfit;font-size:.8em;color:var(--text3)';
 
-  // Demo news
-  $('newsFeed').innerHTML=`
-    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">טראמפ מזהיר את איראן: ״אם הורמוז לא ייפתח — נתקוף תשתיות אנרגיה״</div><span class="ni-impact bullish">חיובי לזהב ↑</span><div class="ni-summary">מתיחות גיאופוליטית דוחפת משקיעים לנכסי מקלט. זהב עולה כתגובה.</div></div>
-    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">הנפט זינק מעל $83 — החות׳ים מאיימים על הים האדום</div><span class="ni-impact bullish">חיובי לזהב ↑</span><div class="ni-summary">עליית מחירי אנרגיה מגבירה חששות אינפלציה, מחזקת ביקוש לזהב.</div></div>
-    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">הדולר מתחזק מעל 100 — הגבוה ביותר מאז מאי 2025</div><span class="ni-impact bearish">שלילי לזהב ↓</span><div class="ni-summary">דולר חזק לוחץ על מחיר הזהב. אבל הגיאופוליטיקה גוברת.</div></div>
-  `;
+  $('cGoldP').textContent='---';$('cDxyP').textContent='---';$('cOilP').textContent='---';
 
-  // Demo MTF
-  $('mtfL').textContent='עולה ↑';$('mtfL').className='mtf-v up';$('mtfLD').textContent='SMA 14: 4,487';
-  $('mtfM').textContent='עולה ↑';$('mtfM').className='mtf-v up';$('mtfMD').textContent='תמיכה: 4,471';
-  $('mtfS').textContent='ניטרלי →';$('mtfS').className='mtf-v flat';$('mtfSD').textContent='התנגדות: 4,538';
-  $('mtfSum').textContent='🟡 2/3 טווחים עולים — סיגנל בינוני לקנייה. נפט וגיאופוליטיקה תומכים, דולר לוחץ.';
+  $('newsFeed').innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.85em">לחצי "התחבר" לטעינת חדשות חיות</div>';
 
-  // Demo signal
-  $('sigP').className='cd sig buy';
-  $('sTag').className='stag buy';$('sTag').textContent='🟢 קנייה!';
-  $('sReason').textContent='📌 MTF 2/3 ↑ · RSI<40 · MACD+ · EMA>SMA · קורלציות חיוביות · חדשות חיוביות';
-  $('sE').textContent='4,512.85';$('sSL').textContent='4,489.20';$('sTP').textContent='4,548.50';
-  $('strF').style.width='72%';$('strF').style.background='var(--green)';$('strP').textContent='72%';
+  $('mtfL').textContent='---';$('mtfM').textContent='---';$('mtfS').textContent='---';
+  $('mtfSum').textContent='ממתין לחיבור...';
 
-  // Demo indicators
+  $('sigP').className='cd sig';
+  $('sTag').className='stag wait';$('sTag').textContent='ממתין';
+  $('sReason').textContent='הבוט יתחיל לנתח ברגע שתלחצי התחבר בדפדפן';
+  $('sE').textContent='---';$('sSL').textContent='---';$('sTP').textContent='---';
+
   const demoInds=[
-    {n:'RSI (14)',v:'38.4',s:'b',l:'קנייה',e:'מתחת 30 = מכור יתר, מעל 70 = קנוי יתר'},
-    {n:'MACD',v:'+2.340',s:'b',l:'קנייה',e:'קו מהיר מעל האיטי = מומנטום חיובי'},
-    {n:'Stochastic',v:'42.1',s:'n',l:'ניטרלי',e:'מתחת 20 = קנייה, מעל 80 = מכירה'},
-    {n:'Bollinger',v:'4471–4538',s:'n',l:'באמצע',e:'תחתית = קנייה, ראש = מכירה'},
-    {n:'SMA 20',v:'4,498.30',s:'b',l:'מעל',e:'מחיר מעל = מגמה עולה'},
-    {n:'SMA 50',v:'4,462.10',s:'b',l:'מעל',e:'ממוצע ארוך. מעל = מגמה חיובית יציבה'},
-    {n:'EMA 9',v:'4,505.70',s:'b',l:'חיובי',e:'מעל SMA = מגמה מתחזקת'},
-    {n:'ATR (14)',v:'11.82',s:'n',l:'רגוע',e:'תנודתיות. קובע SL ו-TP'}
+    {n:'RSI (14)',v:'--',s:'n',l:'---',e:'מתחת 30 = מכור יתר, מעל 70 = קנוי יתר'},
+    {n:'MACD',v:'--',s:'n',l:'---',e:'קו מהיר מעל האיטי = מומנטום חיובי'},
+    {n:'Stochastic',v:'--',s:'n',l:'---',e:'מתחת 20 = קנייה, מעל 80 = מכירה'},
+    {n:'Bollinger',v:'--',s:'n',l:'---',e:'תחתית = קנייה, ראש = מכירה'},
+    {n:'SMA 20',v:'--',s:'n',l:'---',e:'מחיר מעל = מגמה עולה'},
+    {n:'SMA 50',v:'--',s:'n',l:'---',e:'ממוצע ארוך. מעל = מגמה חיובית יציבה'},
+    {n:'EMA 9',v:'--',s:'n',l:'---',e:'מעל SMA = מגמה מתחזקת'},
+    {n:'ATR (14)',v:'--',s:'n',l:'---',e:'תנודתיות. קובע SL ו-TP'}
   ];
   $('indL').innerHTML=demoInds.map(i=>`<div class="ind-r" onclick="this.classList.toggle('open')"><div class="ind-m"><span class="ind-n">${i.n}</span><span class="ind-v">${i.v}</span><span class="chip ${i.s}">${i.l}</span></div><div class="ind-e">${i.e}</div></div>`).join('');
 
-  // Demo history
-  $('hL').innerHTML=`
-    <div class="hi"><span class="ht buy">קנייה</span><span class="hp">4,512.85</span><span class="hrr">R:R 1.5</span><span class="htm">14:32</span></div>
-    <div class="hi"><span class="ht sell">מכירה</span><span class="hp">4,498.20</span><span class="hrr">R:R 1.8</span><span class="htm">13:47</span></div>
-    <div class="hi"><span class="ht buy">קנייה</span><span class="hp">4,476.50</span><span class="hrr">R:R 2.1</span><span class="htm">12:15</span></div>
-  `;
-
-  // Demo status
-  $('dot').className='dot on';
-  $('stLbl').textContent='תצוגה מקדימה — לחצי התחבר לנתונים חיים';
+  $('hL').innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.85em">ממתין לסיגנל ראשון...</div>';
 }
 </script>
 </body>
