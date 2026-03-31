@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בס"ד | GoldPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8F7F4;--surface:#FFFFFF;--surface-warm:#FAF9F6;--surface-hover:#F3F1EC;
+  --border:#E5E1D8;--border-soft:#EDEAE3;
+  --gold:#A67C2E;--gold-light:#C4993D;--gold-dark:#7D5C1F;--gold-bg:rgba(166,124,46,.05);--gold-bg2:rgba(166,124,46,.1);
+  --green:#2D8B57;--green-bg:rgba(45,139,87,.06);--green-border:rgba(45,139,87,.18);
+  --red:#C0392B;--red-bg:rgba(192,57,43,.06);--red-border:rgba(192,57,43,.18);
+  --blue:#2E6B9E;--blue-bg:rgba(46,107,158,.06);
+  --orange:#D4760A;--orange-bg:rgba(212,118,10,.06);
+  --text:#1C1B18;--text2:#5C5849;--text3:#949085;
+  --sh:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.02);
+  --sh2:0 4px 20px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.03);
+  --sh3:0 8px 32px rgba(0,0,0,.07);
+  --r:14px;--rs:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* Subtle texture */
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A67C2E' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+.wrap{max-width:940px;margin:0 auto;padding:20px;position:relative;z-index:1}
+
+/* ===== HEADER ===== */
+.hdr{text-align:center;padding:36px 0 24px;position:relative}
+.bsd{position:absolute;top:0;right:0;font-family:'Playfair Display',serif;font-size:13px;color:var(--text3);letter-spacing:1px}
+.hdr h1{font-family:'Playfair Display',serif;font-size:2.8em;font-weight:300;letter-spacing:6px;text-transform:uppercase;color:var(--text)}
+.hdr h1 b{font-weight:700;color:var(--gold)}
+.hdr .sub{font-size:.88em;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-top:4px;font-weight:400}
+.hdr-line{width:50px;height:1px;background:var(--gold);margin:16px auto 0;opacity:.5}
+
+/* ===== STATUS ===== */
+.stat{display:flex;align-items:center;justify-content:center;gap:22px;padding:10px 0 16px;flex-wrap:wrap}
+.sc{display:flex;align-items:center;gap:6px;font-size:.78em;color:var(--text2);font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
+.dot.on{background:var(--green);animation:dp 2s infinite}
+.dot.off{background:var(--red)}
+@keyframes dp{0%,100%{box-shadow:0 0 0 0 rgba(45,139,87,.3)}50%{box-shadow:0 0 0 4px rgba(45,139,87,0)}}
+
+/* ===== CARD ===== */
+.cd{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px;box-shadow:var(--sh);transition:box-shadow .2s}
+.cd:hover{box-shadow:var(--sh2)}
+.cd-t{font-family:'Playfair Display',serif;font-size:1.15em;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cd-t small{font-family:'Outfit';font-size:.55em;color:var(--text3);font-weight:400;letter-spacing:1px;text-transform:uppercase}
+
+/* ===== SETUP ===== */
+.setup p{font-size:.84em;color:var(--text2);line-height:1.7;margin-bottom:12px}
+.setup a{color:var(--gold-dark);font-weight:600}
+.inp-row{display:flex;gap:10px}
+.inp{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-size:.82em;background:var(--surface-warm);color:var(--text);direction:ltr;transition:border-color .2s}
+.inp:focus{outline:none;border-color:var(--gold)}
+.btn-gold{padding:11px 24px;background:var(--gold);color:#fff;border:none;border-radius:var(--rs);font-family:'Outfit';font-size:.84em;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-gold:hover{background:var(--gold-dark);transform:translateY(-1px)}
+.api-st{font-size:.78em;margin-top:8px;color:var(--text3)}
+.api-st.ok{color:var(--green)}.api-st.err{color:var(--red)}
+
+/* ===== CONTROLS ===== */
+.ctrls{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.pill{background:var(--surface);border:1.5px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:100px;cursor:pointer;font-family:'Outfit';font-size:.8em;font-weight:500;transition:all .15s}
+.pill:hover{border-color:var(--gold);color:var(--gold-dark)}
+.pill.on{background:var(--gold-bg2);border-color:var(--gold);color:var(--gold-dark)}
+
+/* ===== PROGRESS ===== */
+.prog{margin-bottom:16px}
+.prog-info{display:flex;justify-content:space-between;font-size:.78em;color:var(--text2);margin-bottom:5px}
+.prog-bar{height:3px;background:var(--border-soft);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
+
+/* ===== PRICE HERO ===== */
+.price-hero{text-align:center;padding:32px 28px 20px;position:relative;overflow:hidden}
+.price-hero::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-light),transparent);opacity:.4}
+.pp{font-size:.72em;font-weight:600;color:var(--text3);letter-spacing:5px;text-transform:uppercase;margin-bottom:10px}
+.pv{font-family:'Playfair Display',serif;font-size:3.8em;font-weight:300;direction:ltr;letter-spacing:-2px;line-height:1}
+.pv .dlr{font-size:.48em;color:var(--text3);vertical-align:top;margin-right:2px}
+.pch{font-family:'JetBrains Mono',monospace;font-size:.92em;margin-top:6px;direction:ltr;font-weight:600}
+.pch.up{color:var(--green)}.pch.dn{color:var(--red)}
+.pmeta{display:flex;justify-content:center;gap:28px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-soft);flex-wrap:wrap}
+.pm{text-align:center}
+.pm-l{font-size:.62em;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:2px}
+.pm-v{font-family:'JetBrains Mono',monospace;font-size:.84em;color:var(--text2);direction:ltr}
+.mini-chart{width:100%;height:80px;margin-top:12px}
+.mini-chart canvas{width:100%;height:100%}
+
+/* ===== CORRELATION PANEL ===== */
+.corr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.corr-item{background:var(--surface-warm);border-radius:var(--rs);padding:16px;text-align:center;border:1px solid var(--border-soft);transition:border-color .2s}
+.corr-item:hover{border-color:var(--gold)}
+.ci-icon{font-size:1.4em;margin-bottom:6px}
+.ci-name{font-size:.7em;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:6px}
+.ci-price{font-family:'JetBrains Mono',monospace;font-size:1.05em;font-weight:700;direction:ltr}
+.ci-chg{font-family:'JetBrains Mono',monospace;font-size:.75em;direction:ltr;margin-top:3px}
+.ci-chg.up{color:var(--green)}.ci-chg.dn{color:var(--red)}
+.ci-impact{font-size:.68em;margin-top:6px;padding:3px 10px;border-radius:100px;display:inline-block;font-weight:600}
+.ci-impact.bullish{background:var(--green-bg);color:var(--green)}
+.ci-impact.bearish{background:var(--red-bg);color:var(--red)}
+.ci-impact.neutral{background:var(--gold-bg);color:var(--gold-dark)}
+
+/* ===== NEWS FEED ===== */
+.news-item{padding:14px 0;border-bottom:1px solid var(--border-soft)}
+.news-item:last-child{border-bottom:none}
+.ni-time{font-size:.68em;color:var(--text3);font-weight:500;margin-bottom:4px}
+.ni-title{font-size:.88em;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.5}
+.ni-impact{font-size:.75em;padding:2px 10px;border-radius:100px;display:inline-block;font-weight:600}
+.ni-impact.bullish{background:var(--green-bg);color:var(--green)}
+.ni-impact.bearish{background:var(--red-bg);color:var(--red)}
+.ni-impact.neutral{background:var(--gold-bg);color:var(--gold-dark)}
+.ni-summary{font-size:.8em;color:var(--text2);line-height:1.6;margin-top:6px}
+.news-loading{text-align:center;padding:20px;font-size:.85em;color:var(--text3)}
+
+/* ===== MTF ===== */
+.mtf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.mtf-item{background:var(--surface-warm);border-radius:var(--rs);padding:16px;text-align:center;border:1px solid var(--border-soft)}
+.mtf-l{font-size:.68em;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.mtf-v{font-size:1.05em;font-weight:700}
+.mtf-v.up{color:var(--green)}.mtf-v.dn{color:var(--red)}.mtf-v.flat{color:var(--gold-dark)}
+.mtf-d{font-size:.7em;color:var(--text3);margin-top:4px}
+.mtf-summary{background:var(--surface-warm);border-radius:var(--rs);padding:14px;font-size:.84em;line-height:1.7;color:var(--text2);border:1px solid var(--border-soft)}
+
+/* ===== SIGNAL ===== */
+.sig{transition:all .3s}
+.sig.buy{border-color:var(--green-border);box-shadow:var(--sh2),inset 0 0 0 1px var(--green-border)}
+.sig.sell{border-color:var(--red-border);box-shadow:var(--sh2),inset 0 0 0 1px var(--red-border)}
+.sig-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sig-lbl{font-family:'Playfair Display',serif;font-size:1.2em;font-weight:600}
+.stag{padding:7px 20px;border-radius:100px;font-size:.78em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.stag.buy{background:var(--green-bg);color:var(--green);border:1.5px solid var(--green-border)}
+.stag.sell{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-border)}
+.stag.wait{background:var(--gold-bg);color:var(--gold-dark);border:1.5px solid rgba(166,124,46,.2)}
+.sig-reason{background:var(--surface-warm);border-radius:var(--rs);padding:12px 14px;margin-bottom:14px;font-size:.82em;line-height:1.7;color:var(--text2);border:1px solid var(--border-soft)}
+.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sg{background:var(--surface-warm);border-radius:var(--rs);padding:14px;text-align:center;border:1px solid var(--border-soft)}
+.sg-l{font-size:.65em;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:5px}
+.sg-v{font-family:'JetBrains Mono',monospace;font-size:1.1em;font-weight:700;direction:ltr}
+.sg-v.grn{color:var(--green)}.sg-v.red{color:var(--red)}
+.str-bar{height:3px;background:var(--border-soft);border-radius:2px;margin-top:14px}
+.str-fill{height:100%;border-radius:2px;transition:width .8s}
+.str-lbl{display:flex;justify-content:space-between;font-size:.7em;color:var(--text3);margin-top:4px;font-weight:500}
+
+/* ===== INDICATORS ===== */
+.ind-r{padding:11px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .12s}
+.ind-r:last-child{border-bottom:none}
+.ind-r:hover{background:var(--surface-hover);margin:0 -10px;padding:11px 10px;border-radius:8px}
+.ind-m{display:flex;align-items:center;justify-content:space-between;width:100%}
+.ind-n{font-size:.86em;color:var(--text2);font-weight:500;flex:1}
+.ind-v{font-family:'JetBrains Mono',monospace;font-size:.82em;color:var(--text);min-width:75px;text-align:center;direction:ltr}
+.chip{font-size:.7em;padding:3px 11px;border-radius:100px;font-weight:600;min-width:52px;text-align:center}
+.chip.b{background:var(--green-bg);color:var(--green)}
+.chip.s{background:var(--red-bg);color:var(--red)}
+.chip.n{background:var(--gold-bg);color:var(--gold-dark)}
+.ind-e{font-size:.73em;color:var(--text3);line-height:1.5;width:100%;margin-top:6px;max-height:0;overflow:hidden;transition:max-height .3s,opacity .3s;opacity:0}
+.ind-r.open .ind-e{max-height:60px;opacity:1}
+
+/* ===== HISTORY ===== */
+.hi{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:.82em}
+.hi:last-child{border-bottom:none}
+.ht{padding:3px 11px;border-radius:100px;font-size:.72em;font-weight:700;min-width:48px;text-align:center}
+.ht.buy{background:var(--green-bg);color:var(--green)}.ht.sell{background:var(--red-bg);color:var(--red)}
+.hp{font-family:'JetBrains Mono',monospace;color:var(--text2);direction:ltr}
+.hrr{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold-dark);direction:ltr}
+.htm{color:var(--text3);font-size:.76em}
+
+/* ===== FOOTER ===== */
+.ftr{text-align:center;padding:20px;font-size:.7em;color:var(--text3);line-height:1.8;border-top:1px solid var(--border-soft);margin-top:10px}
+
+/* ===== SPLASH ===== */
+.splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;transition:opacity .6s}
+.splash.x{opacity:0;pointer-events:none}
+.sp-r{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sp-t{margin-top:16px;font-family:'Playfair Display',serif;color:var(--gold-dark);letter-spacing:4px;font-size:.95em}
+
+/* ===== ANIMATION ===== */
+.rv{opacity:0;transform:translateY(14px);animation:rvUp .6s ease forwards}
+@keyframes rvUp{to{opacity:1;transform:translateY(0)}}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}.d5{animation-delay:.3s}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){.pv{font-size:2.8em}.sig-grid,.mtf-grid,.corr-grid{grid-template-columns:1fr 1fr}.hdr h1{font-size:2em;letter-spacing:3px}.pmeta{gap:14px}.inp-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash"><div class="sp-r"></div><div class="sp-t">GoldPulse</div></div>
+
+<div class="wrap">
+  <div class="hdr rv">
+    <div class="bsd">בס״ד</div>
+    <h1>GOLD<b>PULSE</b></h1>
+    <div class="sub">Gold Intelligence Platform</div>
+    <div class="hdr-line"></div>
+  </div>
+
+  <div class="stat rv d1">
+    <div class="sc"><div class="dot" id="dot"></div><span id="stLbl">ממתין</span></div>
+    <div class="sc">🕐 <span id="tmLbl">--:--</span></div>
+    <div class="sc">📊 <span id="scLbl">0</span></div>
+  </div>
+
+  <div class="cd setup rv d1" id="setup">
+    <div class="cd-t">🔑 התחברות</div>
+    <p>לחצי <b>"התחבר"</b> לקבלת מחיר זהב חי. הבוט מתחבר אוטומטית.<br>
+    <b>אופציונלי:</b> מפתח מ-<a href="https://www.goldapi.io" target="_blank">goldapi.io</a> (חינם) לדיוק נוסף.</p>
+    <div class="inp-row">
+      <input class="inp" id="keyInp" placeholder="אופציונלי — goldapi-XXXX-io" dir="ltr">
+      <button class="btn-gold" onclick="connect()">התחבר</button>
+    </div>
+    <div class="api-st" id="apiSt"></div>
+  </div>
+
+  <div class="prog rv d2" id="progWrap" style="display:none">
+    <div class="prog-info"><span id="progTxt">טוען...</span><span id="progPct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0"></div></div>
+  </div>
+
+  <div id="mainUI">
+
+  <div class="ctrls rv d2">
+    <button class="pill on" id="bAlert" onclick="tAlert()">🔔 צליל</button>
+    <button class="pill" id="bPush" onclick="tPush()">📱 Push</button>
+    <button class="pill" id="bAggro" onclick="tAggro()">⚡ אגרסיבי</button>
+  </div>
+
+  <!-- PRICE -->
+  <div class="cd price-hero rv d2">
+    <div class="pp">XAU / USD — זהב</div>
+    <div class="pv" id="pMain"><span class="dlr">$</span>----.--</div>
+    <div class="pch" id="pChg">&nbsp;</div>
+    <div class="pmeta">
+      <div class="pm"><div class="pm-l">Bid</div><div class="pm-v" id="mBid">---</div></div>
+      <div class="pm"><div class="pm-l">Ask</div><div class="pm-v" id="mAsk">---</div></div>
+      <div class="pm"><div class="pm-l">High</div><div class="pm-v" id="mHi">---</div></div>
+      <div class="pm"><div class="pm-l">Low</div><div class="pm-v" id="mLo">---</div></div>
+    </div>
+    <div class="mini-chart"><canvas id="cv"></canvas></div>
+  </div>
+
+  <!-- CORRELATIONS -->
+  <div class="cd rv d3">
+    <div class="cd-t">🔗 קורלציות שוק <small>השפעה על זהב</small></div>
+    <div class="corr-grid" id="corrGrid">
+      <div class="corr-item" id="corrGold"><div class="ci-icon">🥇</div><div class="ci-name">זהב XAU</div><div class="ci-price" id="cGoldP">---</div><div class="ci-chg" id="cGoldC">---</div></div>
+      <div class="corr-item" id="corrDxy"><div class="ci-icon">💵</div><div class="ci-name">דולר DXY</div><div class="ci-price" id="cDxyP">---</div><div class="ci-chg" id="cDxyC">---</div><div class="ci-impact neutral" id="cDxyImp">---</div></div>
+      <div class="corr-item" id="corrOil"><div class="ci-icon">🛢️</div><div class="ci-name">נפט WTI</div><div class="ci-price" id="cOilP">---</div><div class="ci-chg" id="cOilC">---</div><div class="ci-impact neutral" id="cOilImp">---</div></div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="cd rv d3">
+    <div class="cd-t">📰 חדשות משפיעות <small>עדכון אוטומטי</small></div>
+    <div id="newsFeed"><div class="news-loading">⏳ טוען חדשות...</div></div>
+  </div>
+
+  <!-- MTF -->
+  <div class="cd rv d3">
+    <div class="cd-t">🔍 ניתוח רב-מסגרות</div>
+    <div class="mtf-grid">
+      <div class="mtf-item"><div class="mtf-l">טווח ארוך</div><div class="mtf-v flat" id="mtfL">---</div><div class="mtf-d" id="mtfLD"></div></div>
+      <div class="mtf-item"><div class="mtf-l">טווח בינוני</div><div class="mtf-v flat" id="mtfM">---</div><div class="mtf-d" id="mtfMD"></div></div>
+      <div class="mtf-item"><div class="mtf-l">טווח קצר</div><div class="mtf-v flat" id="mtfS">---</div><div class="mtf-d" id="mtfSD"></div></div>
+    </div>
+    <div class="mtf-summary" id="mtfSum">ממתין לניתוח...</div>
+  </div>
+
+  <!-- SIGNAL -->
+  <div class="cd sig rv d4" id="sigP">
+    <div class="sig-top"><div class="sig-lbl">סיגנל פעיל</div><div class="stag wait" id="sTag">ממתין</div></div>
+    <div class="sig-reason" id="sReason">הבוט מנתח ביחד: טכני + קורלציות + חדשות...</div>
+    <div class="sig-grid">
+      <div class="sg"><div class="sg-l">כניסה</div><div class="sg-v" id="sE">---</div></div>
+      <div class="sg"><div class="sg-l">סטופ לוס</div><div class="sg-v red" id="sSL">---</div></div>
+      <div class="sg"><div class="sg-l">טייק פרופיט</div><div class="sg-v grn" id="sTP">---</div></div>
+    </div>
+    <div class="str-bar"><div class="str-fill" id="strF" style="width:0;background:var(--gold)"></div></div>
+    <div class="str-lbl"><span>עוצמת סיגנל</span><span id="strP">0%</span></div>
+  </div>
+
+  <!-- INDICATORS -->
+  <div class="cd rv d4">
+    <div class="cd-t">📈 אינדיקטורים <small>לחצי להסבר</small></div>
+    <div id="indL"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="cd rv d4">
+    <div class="cd-t">📋 היסטוריית סיגנלים</div>
+    <div id="hL"><div style="text-align:center;padding:20px;color:var(--text3);font-size:.85em">ממתין לסיגנל ראשון...</div></div>
+  </div>
+
+  <div class="ftr">⚠️ GoldPulse מספק סיגנלים לצורכי מידע בלבד ואינו מהווה ייעוץ פיננסי.<br>מסחר כרוך בסיכון. תמיד סטופ לוס. מקסימום 1-2% מהחשבון לעסקה.</div>
+
+  </div><!-- /mainUI -->
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const S={key:'',prices:[],px:null,op:null,bid:null,ask:null,hi:null,lo:null,
+  alerts:true,push:false,aggro:false,scans:0,sigs:[],lastSig:null,lastSigT:0,
+  live:false,chart:[],iv:null,_ch:null,_chp:null,
+  dxy:{price:null,ch:null},oil:{price:null,ch:null},
+  newsScore:0, // -2 to +2
+  corrScore:0 // -2 to +2
+};
+
+// ===== AUDIO =====
+function beep(t){if(!S.alerts)return;try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);if(t==='buy'){o.frequency.setValueAtTime(523,c.currentTime);o.frequency.setValueAtTime(659,c.currentTime+.12);o.frequency.setValueAtTime(784,c.currentTime+.24);o.type='sine';}else{o.frequency.setValueAtTime(784,c.currentTime);o.frequency.setValueAtTime(659,c.currentTime+.12);o.frequency.setValueAtTime(523,c.currentTime+.24);o.type='triangle';}g.gain.value=.18;o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5);o.stop(c.currentTime+.5);}catch(e){}}
+function pushNotif(title,body){if(!S.push)return;if(Notification.permission==='granted')new Notification(title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🥇</text></svg>'});}
+
+// ===== TOGGLES =====
+function tAlert(){S.alerts=!S.alerts;$('bAlert').classList.toggle('on');$('bAlert').textContent=S.alerts?'🔔 צליל':'🔇 כבוי';}
+function tPush(){if(!S.push){Notification.requestPermission().then(p=>{if(p==='granted'){S.push=true;$('bPush').classList.add('on');$('bPush').textContent='📱 Push פעיל';pushNotif('GoldPulse','התראות Push הופעלו!');}else alert('יש לאשר התראות בדפדפן');});}else{S.push=false;$('bPush').classList.remove('on');$('bPush').textContent='📱 Push';}}
+function tAggro(){S.aggro=!S.aggro;$('bAggro').classList.toggle('on');$('bAggro').textContent=S.aggro?'⚡ אגרסיבי פעיל':'⚡ אגרסיבי';}
+
+// ===== FETCH PRICES =====
+async function fetchGold(){
+  const sources=[
+    {n:'gold-api.com',fn:async()=>{const r=await fetch('https://api.gold-api.com/price/XAU',{signal:AbortSignal.timeout(6000)});if(!r.ok)throw 0;const d=await r.json();if(!d.price||d.price<1000||d.price>10000)throw 0;S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.highPrice||d.high||S.hi;S.lo=d.lowPrice||d.low||S.lo;return{p:Math.round(d.price*100)/100,s:'gold-api.com'};}},
+    {n:'goldapi.io',fn:async()=>{if(!S.key)throw 0;const r=await fetch('https://www.goldapi.io/api/XAU/USD',{headers:{'x-access-token':S.key,'Content-Type':'application/json'},signal:AbortSignal.timeout(8000)});if(!r.ok)throw 0;const d=await r.json();if(d.error||!d.price)throw 0;S.bid=d.bid||S.bid;S.ask=d.ask||S.ask;S.hi=d.high_price||S.hi;S.lo=d.low_price||S.lo;if(d.open_price&&!S.op)S.op=d.open_price;if(d.ch!==undefined)S._ch=d.ch;if(d.chp!==undefined)S._chp=d.chp;return{p:Math.round(d.price*100)/100,s:'goldapi.io'};}},
+    {n:'Swissquote',fn:async()=>{const r=await fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw 0;const d=await r.json();const p=d?.[0]?.spreadProfilePrices?.[0];if(!p)throw 0;const px=(p.ask+p.bid)/2;S.bid=p.bid;S.ask=p.ask;return{p:Math.round(px*100)/100,s:'Swissquote'};}}
+  ];
+  for(const s of sources){try{const r=await s.fn();if(!S.live){S.live=true;$('dot').className='dot on';$('stLbl').textContent='חי — '+r.s;}return r.p;}catch(e){}}
+  if(S.live){S.live=false;$('dot').className='dot off';$('stLbl').textContent='חיבור נפל';}return null;
+}
+
+async function fetchDXY(){
+  try{const r=await fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/USD/CHF',{signal:AbortSignal.timeout(5000)});
+    if(!r.ok)return;const d=await r.json();const p=d?.[0]?.spreadProfilePrices?.[0];
+    if(p){const px=(p.ask+p.bid)/2;
+      // Approximate DXY from USD/CHF (correlated ~0.5)
+      // DXY ≈ 100 baseline, scale USD/CHF movement
+      const dxy=px*110; // rough proxy
+      const prev=S.dxy.price;S.dxy.price=Math.round(dxy*100)/100;
+      if(prev)S.dxy.ch=((S.dxy.price-prev)/prev*100);
+    }
+  }catch(e){}
+  // Also try direct fetch for a DXY-like indicator
+  try{const r2=await fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/EUR/USD',{signal:AbortSignal.timeout(4000)});
+    if(r2.ok){const d2=await r2.json();const p2=d2?.[0]?.spreadProfilePrices?.[0];
+      if(p2){const eurusd=(p2.ask+p2.bid)/2;
+        // DXY ≈ 50.14348112 × EURUSD^(−0.576) × ... simplified: DXY ≈ 96/EURUSD
+        const dxy=96/eurusd;
+        S.dxy.price=Math.round(dxy*100)/100;
+      }
+    }
+  }catch(e){}
+}
+
+async function fetchOil(){
+  try{
+    // gold-api.com might have oil
+    const r=await fetch('https://api.gold-api.com/price/WTI',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){const d=await r.json();if(d.price&&d.price>10&&d.price<300){const prev=S.oil.price;S.oil.price=Math.round(d.price*100)/100;if(prev)S.oil.ch=((S.oil.price-prev)/prev*100);return;}}
+  }catch(e){}
+  try{
+    const r=await fetch('https://api.gold-api.com/price/BRENT',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){const d=await r.json();if(d.price&&d.price>10&&d.price<300){const prev=S.oil.price;S.oil.price=Math.round(d.price*100)/100;if(prev)S.oil.ch=((S.oil.price-prev)/prev*100);}}
+  }catch(e){}
+}
+
+// ===== NEWS VIA ANTHROPIC =====
+async function fetchNews(){
+  $('newsFeed').innerHTML='<div class="news-loading">⏳ מחפש חדשות על זהב, דולר, נפט, טראמפ...</div>';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Search for the latest news about gold prices, Trump tariffs, Iran conflict, US dollar, and oil prices that affect gold trading. Then provide a brief summary in Hebrew of the 3-4 most important news items from TODAY that affect gold prices.
+
+For each news item respond in this exact JSON format (no markdown, no backticks):
+[{"title":"כותרת בעברית","summary":"סיכום קצר בעברית","impact":"bullish/bearish/neutral","reason":"למה זה משפיע על זהב"}]
+
+Only return the JSON array, nothing else.`}]
+      })
+    });
+    if(!res.ok)throw new Error(res.status);
+    const data=await res.json();
+    const text=data.content?.filter(c=>c.type==='text').map(c=>c.text).join('')||'';
+
+    let news=[];
+    try{
+      const clean=text.replace(/```json|```/g,'').trim();
+      news=JSON.parse(clean);
+    }catch(e){
+      // Try to find JSON in response
+      const match=text.match(/\[[\s\S]*?\]/);
+      if(match)try{news=JSON.parse(match[0]);}catch(e2){}
+    }
+
+    if(news.length>0){
+      // Calculate news sentiment score
+      let score=0;
+      news.forEach(n=>{if(n.impact==='bullish')score++;if(n.impact==='bearish')score--;});
+      S.newsScore=Math.max(-2,Math.min(2,score));
+
+      $('newsFeed').innerHTML=news.map(n=>`
+        <div class="news-item">
+          <div class="ni-title">${n.title}</div>
+          <span class="ni-impact ${n.impact}">${n.impact==='bullish'?'חיובי לזהב ↑':n.impact==='bearish'?'שלילי לזהב ↓':'ניטרלי'}</span>
+          <div class="ni-summary">${n.summary}${n.reason?' — '+n.reason:''}</div>
+        </div>
+      `).join('');
+    }else{
+      $('newsFeed').innerHTML='<div class="news-loading">לא נמצאו חדשות רלוונטיות. ינסה שוב בעוד 10 דקות.</div>';
+    }
+  }catch(e){
+    $('newsFeed').innerHTML=`<div class="news-loading">⚠️ חדשות לא זמינות כרגע (${e.message}). הסיגנלים ממשיכים לעבוד על בסיס ניתוח טכני וקורלציות.</div>`;
+  }
+}
+
+// ===== UPDATE CORRELATIONS =====
+function updCorr(){
+  // Gold
+  if(S.px){$('cGoldP').textContent='$'+S.px.toFixed(2);
+    if(S._chp!==null){$('cGoldC').textContent=(S._chp>=0?'+':'')+S._chp.toFixed(2)+'%';$('cGoldC').className='ci-chg '+(S._chp>=0?'up':'dn');}
+  }
+  // DXY
+  if(S.dxy.price){
+    $('cDxyP').textContent=S.dxy.price.toFixed(2);
+    if(S.dxy.ch!==null){$('cDxyC').textContent=(S.dxy.ch>=0?'+':'')+S.dxy.ch.toFixed(2)+'%';$('cDxyC').className='ci-chg '+(S.dxy.ch>=0?'up':'dn');
+      // Inverse correlation: DXY up = bad for gold
+      const imp=S.dxy.ch>0.1?'bearish':S.dxy.ch<-0.1?'bullish':'neutral';
+      $('cDxyImp').textContent=imp==='bullish'?'חיובי לזהב':imp==='bearish'?'שלילי לזהב':'ניטרלי';
+      $('cDxyImp').className='ci-impact '+imp;
+    }
+  }
+  // Oil
+  if(S.oil.price){
+    $('cOilP').textContent='$'+S.oil.price.toFixed(2);
+    if(S.oil.ch!==null){$('cOilC').textContent=(S.oil.ch>=0?'+':'')+S.oil.ch.toFixed(2)+'%';$('cOilC').className='ci-chg '+(S.oil.ch>=0?'up':'dn');
+      // Positive correlation: Oil up = good for gold (inflation hedge)
+      const imp=S.oil.ch>0.2?'bullish':S.oil.ch<-0.2?'bearish':'neutral';
+      $('cOilImp').textContent=imp==='bullish'?'חיובי לזהב':imp==='bearish'?'שלילי לזהב':'ניטרלי';
+      $('cOilImp').className='ci-impact '+imp;
+    }
+  }
+  // Correlation score for signal
+  let cs=0;
+  if(S.dxy.ch<-0.1)cs++;if(S.dxy.ch>0.1)cs--;
+  if(S.oil.ch>0.2)cs++;if(S.oil.ch<-0.2)cs--;
+  S.corrScore=cs;
+}
+
+// ===== INDICATORS =====
+function _sma(p,n){if(p.length<n)return null;return p.slice(-n).reduce((a,b)=>a+b,0)/n;}
+function _ema(p,n){if(p.length<n)return null;const k=2/(n+1);let e=p.slice(0,n).reduce((a,b)=>a+b,0)/n;for(let i=n;i<p.length;i++)e=p[i]*k+e*(1-k);return e;}
+function _rsi(p,n=14){if(p.length<n+1)return null;let g=0,l=0;for(let i=p.length-n;i<p.length;i++){const d=p[i]-p[i-1];d>0?g+=d:l-=d;}return l===0?100:100-(100/(1+(g/n)/(l/n)));}
+function _macd(p){const e12=_ema(p,12),e26=_ema(p,26);if(!e12||!e26)return null;return{m:e12-e26,s:_ema(p.slice(-9),9)||0};}
+function _bb(p,n=20){if(p.length<n)return null;const m=_sma(p,n),sl=p.slice(-n),std=Math.sqrt(sl.reduce((s,v)=>s+Math.pow(v-m,2),0)/n);return{u:m+2*std,m,l:m-2*std};}
+function _stoch(p,n=14){if(p.length<n)return null;const s=p.slice(-n),h=Math.max(...s),l=Math.min(...s);return h===l?50:((p[p.length-1]-l)/(h-l))*100;}
+function _atr(p,n=14){if(p.length<n+1)return null;let s=0;for(let i=p.length-n;i<p.length;i++)s+=Math.abs(p[i]-p[i-1]);return s/n;}
+
+function trendOf(p,sh,lo){const a=_sma(p,sh),b=_sma(p,lo);if(!a||!b)return'flat';const d=(a-b)/b*100;return d>.05?'up':d<-.05?'down':'flat';}
+
+function mtfAnalysis(prices){
+  const tL=trendOf(prices,5,Math.min(prices.length,14));
+  const tM=trendOf(prices,10,Math.min(prices.length,50));
+  const tS=trendOf(prices,5,20);
+  const lbl={up:'עולה ↑',down:'יורד ↓',flat:'ניטרלי →'};
+  const cls={up:'up',down:'dn',flat:'flat'};
+  $('mtfL').textContent=lbl[tL];$('mtfL').className='mtf-v '+cls[tL];
+  $('mtfM').textContent=lbl[tM];$('mtfM').className='mtf-v '+cls[tM];
+  $('mtfS').textContent=lbl[tS];$('mtfS').className='mtf-v '+cls[tS];
+  if(prices.length>=20){const r=prices.slice(-20);$('mtfLD').textContent='SMA: '+(_sma(prices,Math.min(14,prices.length))||0).toFixed(0);$('mtfMD').textContent='תמיכה: '+Math.min(...r).toFixed(0);$('mtfSD').textContent='התנגדות: '+Math.max(...r).toFixed(0);}
+  const ts=[tL,tM,tS],ups=ts.filter(t=>t==='up').length,dns=ts.filter(t=>t==='down').length;
+  if(ups===3)return{c:'buy',a:3,sum:'🟢 כל 3 הטווחים עולים — סיגנל חזק'};
+  if(dns===3)return{c:'sell',a:3,sum:'🔴 כל 3 הטווחים יורדים — סיגנל חזק'};
+  if(ups>=2)return{c:'buy',a:2,sum:'🟡 2/3 טווחים עולים — סיגנל בינוני'};
+  if(dns>=2)return{c:'sell',a:2,sum:'🟡 2/3 טווחים יורדים — סיגנל בינוני'};
+  return{c:'flat',a:0,sum:'⏸️ אין הסכמה — לא מומלץ להיכנס'};
+}
+
+// ===== SIGNAL ENGINE (Technical + Correlations + News) =====
+function genSignal(prices){
+  if(prices.length<30)return null;
+  const px=prices[prices.length-1];
+  const r=_rsi(prices),m=_macd(prices),b=_bb(prices),st=_stoch(prices),sm=_sma(prices,20),em=_ema(prices,9),at=_atr(prices);
+  if(!r||!m||!b||!st||!sm||!em||!at)return null;
+
+  const mtf=mtfAnalysis(prices);
+  $('mtfSum').textContent=mtf.sum;
+
+  let bs=0,ss=0,reasons=[];
+  const th=S.aggro?2:3;
+
+  // MTF
+  if(mtf.c==='buy'){bs+=mtf.a;reasons.push(`MTF ${mtf.a}/3 ↑`);}
+  if(mtf.c==='sell'){ss+=mtf.a;reasons.push(`MTF ${mtf.a}/3 ↓`);}
+
+  // Technical
+  if(r<30){bs+=2;reasons.push('RSI<30');}else if(r<40)bs++;
+  if(r>70){ss+=2;reasons.push('RSI>70');}else if(r>60)ss++;
+  if(m.m>m.s){bs++;reasons.push('MACD+');}if(m.m<m.s){ss++;reasons.push('MACD−');}
+  if(px<=b.l){bs+=2;reasons.push('BB תחתון');}else if(px<b.m)bs++;
+  if(px>=b.u){ss+=2;reasons.push('BB עליון');}else if(px>b.m)ss++;
+  if(st<20){bs++;reasons.push('Stoch↓');}if(st>80){ss++;reasons.push('Stoch↑');}
+  if(em>sm){bs++;reasons.push('EMA>SMA');}if(em<sm){ss++;reasons.push('EMA<SMA');}
+
+  // Correlations bonus
+  if(S.corrScore>0){bs+=S.corrScore;reasons.push('קורלציות חיוביות');}
+  if(S.corrScore<0){ss+=Math.abs(S.corrScore);reasons.push('קורלציות שליליות');}
+
+  // News bonus
+  if(S.newsScore>0){bs+=S.newsScore;reasons.push('חדשות חיוביות');}
+  if(S.newsScore<0){ss+=Math.abs(S.newsScore);reasons.push('חדשות שליליות');}
+
+  if(Date.now()-S.lastSigT<120000)return null;
+
+  const slM=S.aggro?1.5:2,tpM=S.aggro?3:2.5;
+  const mtfOk=S.aggro||mtf.a>=2;
+
+  if(bs>=th&&bs>ss&&(mtf.c==='buy'||S.aggro)&&mtfOk)
+    return{type:'buy',entry:px,sl:+(px-at*slM).toFixed(2),tp:+(px+at*tpM).toFixed(2),str:Math.min(bs/12*100,95),reasons};
+  if(ss>=th&&ss>bs&&(mtf.c==='sell'||S.aggro)&&mtfOk)
+    return{type:'sell',entry:px,sl:+(px+at*slM).toFixed(2),tp:+(px-at*tpM).toFixed(2),str:Math.min(ss/12*100,95),reasons};
+  return null;
+}
+
+// ===== CHART =====
+function drawChart(){
+  const cv=$('cv');if(!cv)return;const ctx=cv.getContext('2d');const d=S.chart;if(d.length<2)return;
+  const dpr=window.devicePixelRatio||1,rect=cv.parentElement.getBoundingClientRect();
+  cv.width=rect.width*dpr;cv.height=rect.height*dpr;cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';
+  ctx.scale(dpr,dpr);const W=rect.width,H=rect.height;ctx.clearRect(0,0,W,H);
+  const mn=Math.min(...d)-.3,mx=Math.max(...d)+.3,rng=mx-mn||1,step=W/(d.length-1);
+  const up=d[d.length-1]>=d[0];
+  ctx.beginPath();d.forEach((v,i)=>{const x=i*step,y=H-((v-mn)/rng)*(H-6)-3;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.strokeStyle=up?'#2D8B57':'#C0392B';ctx.lineWidth=1.5;ctx.stroke();
+  const lx=(d.length-1)*step,ly=H-((d[d.length-1]-mn)/rng)*(H-6)-3;
+  ctx.lineTo(lx,H);ctx.lineTo(0,H);ctx.closePath();
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,up?'rgba(45,139,87,.07)':'rgba(192,57,43,.07)');g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(lx,ly,3,0,Math.PI*2);ctx.fillStyle=up?'#2D8B57':'#C0392B';ctx.fill();
+}
+
+// ===== UI =====
+function updPrice(px){
+  $('pMain').innerHTML=`<span class="dlr">$</span>${px.toFixed(2)}`;
+  S.chart.push(px);if(S.chart.length>150)S.chart.shift();
+  if(S._chp!==null){const e=$('pChg');e.textContent=`${S._ch>=0?'+':''}${S._ch.toFixed(2)} (${S._chp>=0?'+':''}${S._chp.toFixed(2)}%)`;e.className='pch '+(S._ch>=0?'up':'dn');}
+  else{const ref=S.op||S.chart[0];if(ref){const ch=px-ref,pct=ch/ref*100;$('pChg').textContent=`${ch>=0?'+':''}${ch.toFixed(2)} (${pct.toFixed(2)}%)`;$('pChg').className='pch '+(ch>=0?'up':'dn');}}
+  $('mBid').textContent=S.bid?S.bid.toFixed(2):'---';$('mAsk').textContent=S.ask?S.ask.toFixed(2):'---';
+  $('mHi').textContent=S.hi?S.hi.toFixed(2):'---';$('mLo').textContent=S.lo?S.lo.toFixed(2):'---';
+  drawChart();
+}
+
+function updInds(pr){
+  const px=pr[pr.length-1],r=_rsi(pr),m=_macd(pr),b=_bb(pr),st=_stoch(pr),sm=_sma(pr,20),em=_ema(pr,9),at=_atr(pr),sm50=_sma(pr,50);
+  const I=[
+    {n:'RSI (14)',v:r?r.toFixed(1):'--',s:r?(r<30?'b':r>70?'s':'n'):'n',l:r?(r<30?'קנייה':r>70?'מכירה':'ניטרלי'):'--',e:'מתחת 30 = מכור יתר, מעל 70 = קנוי יתר'},
+    {n:'MACD',v:m?m.m.toFixed(3):'--',s:m?(m.m>m.s?'b':'s'):'n',l:m?(m.m>m.s?'קנייה':'מכירה'):'--',e:'קו מהיר מעל האיטי = מומנטום חיובי'},
+    {n:'Stochastic',v:st?st.toFixed(1):'--',s:st?(st<20?'b':st>80?'s':'n'):'n',l:st?(st<20?'קנייה':st>80?'מכירה':'ניטרלי'):'--',e:'מתחת 20 = קנייה, מעל 80 = מכירה'},
+    {n:'Bollinger',v:b?`${b.l.toFixed(0)}–${b.u.toFixed(0)}`:'--',s:b?(px<=b.l?'b':px>=b.u?'s':'n'):'n',l:b?(px<=b.l?'תחתון':px>=b.u?'עליון':'באמצע'):'--',e:'תחתית = קנייה, ראש = מכירה'},
+    {n:'SMA 20',v:sm?sm.toFixed(2):'--',s:sm?(px>sm?'b':'s'):'n',l:sm?(px>sm?'מעל':'מתחת'):'--',e:'מחיר מעל = מגמה עולה'},
+    {n:'SMA 50',v:sm50?sm50.toFixed(2):'--',s:sm50?(px>sm50?'b':'s'):'n',l:sm50?(px>sm50?'מעל':'מתחת'):'--',e:'ממוצע ארוך. מעל = מגמה חיובית יציבה'},
+    {n:'EMA 9',v:em?em.toFixed(2):'--',s:em&&sm?(em>sm?'b':'s'):'n',l:em&&sm?(em>sm?'חיובי':'שלילי'):'--',e:'מעל SMA = מגמה מתחזקת'},
+    {n:'ATR (14)',v:at?at.toFixed(2):'--',s:'n',l:at?(at>15?'תנודתי':'רגוע'):'--',e:'תנודתיות. קובע SL ו-TP'}
+  ];
+  $('indL').innerHTML=I.map(i=>`<div class="ind-r" onclick="this.classList.toggle('open')"><div class="ind-m"><span class="ind-n">${i.n}</span><span class="ind-v">${i.v}</span><span class="chip ${i.s}">${i.l}</span></div><div class="ind-e">${i.e}</div></div>`).join('');
+}
+
+function updSig(sig){
+  const p=$('sigP'),t=$('sTag'),r=$('sReason');
+  if(!sig){p.className='cd sig';t.className='stag wait';t.textContent='סורק...';r.textContent='הבוט מנתח טכני + קורלציות + חדשות...';$('sE').textContent='---';$('sSL').textContent='---';$('sTP').textContent='---';$('strF').style.width='0';$('strP').textContent='0%';return;}
+  p.className=`cd sig ${sig.type}`;t.className=`stag ${sig.type}`;
+  t.textContent=sig.type==='buy'?'🟢 קנייה!':'🔴 מכירה!';
+  r.textContent=sig.reasons?.length?'📌 '+sig.reasons.join(' · '):'';
+  $('sE').textContent=sig.entry.toFixed(2);$('sSL').textContent=sig.sl.toFixed(2);$('sTP').textContent=sig.tp.toFixed(2);
+  const s=Math.round(sig.str);$('strF').style.width=s+'%';$('strF').style.background=sig.type==='buy'?'var(--green)':'var(--red)';$('strP').textContent=s+'%';
+}
+
+function addHist(sig){
+  const l=$('hL');if(l.querySelector('div[style]'))l.innerHTML='';
+  const t=new Date().toLocaleTimeString('he-IL'),rr=Math.abs(sig.tp-sig.entry)/Math.abs(sig.entry-sig.sl);
+  const el=document.createElement('div');el.className='hi';
+  el.innerHTML=`<span class="ht ${sig.type}">${sig.type==='buy'?'קנייה':'מכירה'}</span><span class="hp">${sig.entry.toFixed(2)}</span><span class="hrr">R:R ${rr.toFixed(1)}</span><span class="htm">${t}</span>`;
+  l.insertBefore(el,l.firstChild);while(l.children.length>20)l.removeChild(l.lastChild);
+}
+
+// ===== MAIN TICK =====
+async function tick(){
+  const px=await fetchGold();if(!px)return;
+  S.px=px;S.prices.push(px);if(S.prices.length>500)S.prices.shift();S.scans++;
+  updPrice(px);
+  $('tmLbl').textContent=new Date().toLocaleTimeString('he-IL');
+  $('scLbl').textContent=S.scans+' סריקות';
+
+  // Fetch correlations
+  await Promise.all([fetchDXY(),fetchOil()]);
+  updCorr();
+
+  if(S.prices.length>=15)updInds(S.prices);
+  if(S.prices.length>=20)mtfAnalysis(S.prices);
+  if(S.prices.length>=30){
+    const sig=genSignal(S.prices);
+    if(sig){S.lastSig=sig;S.lastSigT=Date.now();S.sigs.push(sig);updSig(sig);addHist(sig);beep(sig.type);
+      pushNotif(`GoldPulse — ${sig.type==='buy'?'קנייה':'מכירה'}!`,`$${sig.entry.toFixed(2)} | SL: $${sig.sl.toFixed(2)} | TP: $${sig.tp.toFixed(2)}`);}
+    else if(!S.lastSig||Date.now()-S.lastSigT>180000)updSig(null);
+  }
+}
+
+// ===== LOAD HISTORY =====
+async function loadHistory(){
+  $('progWrap').style.display='';$('progTxt').textContent='אוסף נתוני מחיר...';
+  for(let i=0;i<25;i++){
+    const px=await fetchGold();
+    if(px){S.prices.push(px);S.chart.push(px);S.px=px;}
+    $('progFill').style.width=((i+1)/25*100)+'%';$('progPct').textContent=Math.round((i+1)/25*100)+'%';
+    await new Promise(r=>setTimeout(r,600));
+  }
+  $('progTxt').textContent=`✅ נטענו ${S.prices.length} נקודות`;
+  setTimeout(()=>{$('progWrap').style.display='none';},1500);
+}
+
+// ===== CONNECT =====
+async function connect(){
+  const k=$('keyInp').value.trim();
+  if(k){S.key=k;localStorage.setItem('gp5_key',k);}
+  $('apiSt').textContent='⏳ מתחבר...';$('apiSt').className='api-st';
+
+  const px=await fetchGold();
+  if(!px){$('apiSt').textContent='❌ לא הצלחתי. בדקי אינטרנט.';$('apiSt').className='api-st err';return;}
+
+  S.px=px;S.op=px;S.prices.push(px);S.chart.push(px);
+  $('apiSt').textContent=`✅ מחובר! $${px.toFixed(2)}`;$('apiSt').className='api-st ok';
+
+  $('mainUI').style.display='';
+  updPrice(px);
+
+  await loadHistory();
+  $('setup').style.display='none';
+
+  // Fetch news
+  fetchNews();
+  // Refresh news every 10 minutes
+  setInterval(fetchNews,600000);
+
+  // Main loop every 15s
+  if(S.iv)clearInterval(S.iv);
+  S.iv=setInterval(tick,15000);
+  tick();
+}
+
+// ===== INIT =====
+(async()=>{
+  S.key=localStorage.getItem('gp5_key')||'';
+  if(S.key)$('keyInp').value=S.key;
+
+  // Show demo data immediately so UI is never empty
+  loadDemo();
+
+  $('splash').classList.add('x');
+})();
+
+function loadDemo(){
+  // Demo gold price
+  $('pMain').innerHTML='<span class="dlr">$</span>4,512.85';
+  $('pChg').textContent='+37.50 (+0.83%)';$('pChg').className='pch up';
+  $('mBid').textContent='4,512.40';$('mAsk').textContent='4,513.30';
+  $('mHi').textContent='4,538.20';$('mLo').textContent='4,471.60';
+
+  // Demo correlations
+  $('cGoldP').textContent='$4,512.85';
+  $('cDxyP').textContent='100.26';$('cDxyC').textContent='+0.11%';$('cDxyC').className='ci-chg up';
+  $('cDxyImp').textContent='שלילי לזהב';$('cDxyImp').className='ci-impact bearish';
+  $('cOilP').textContent='$83.40';$('cOilC').textContent='+2.1%';$('cOilC').className='ci-chg up';
+  $('cOilImp').textContent='חיובי לזהב';$('cOilImp').className='ci-impact bullish';
+
+  // Demo news
+  $('newsFeed').innerHTML=`
+    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">טראמפ מזהיר את איראן: ״אם הורמוז לא ייפתח — נתקוף תשתיות אנרגיה״</div><span class="ni-impact bullish">חיובי לזהב ↑</span><div class="ni-summary">מתיחות גיאופוליטית דוחפת משקיעים לנכסי מקלט. זהב עולה כתגובה.</div></div>
+    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">הנפט זינק מעל $83 — החות׳ים מאיימים על הים האדום</div><span class="ni-impact bullish">חיובי לזהב ↑</span><div class="ni-summary">עליית מחירי אנרגיה מגבירה חששות אינפלציה, מחזקת ביקוש לזהב.</div></div>
+    <div class="news-item"><div class="ni-time">היום</div><div class="ni-title">הדולר מתחזק מעל 100 — הגבוה ביותר מאז מאי 2025</div><span class="ni-impact bearish">שלילי לזהב ↓</span><div class="ni-summary">דולר חזק לוחץ על מחיר הזהב. אבל הגיאופוליטיקה גוברת.</div></div>
+  `;
+
+  // Demo MTF
+  $('mtfL').textContent='עולה ↑';$('mtfL').className='mtf-v up';$('mtfLD').textContent='SMA 14: 4,487';
+  $('mtfM').textContent='עולה ↑';$('mtfM').className='mtf-v up';$('mtfMD').textContent='תמיכה: 4,471';
+  $('mtfS').textContent='ניטרלי →';$('mtfS').className='mtf-v flat';$('mtfSD').textContent='התנגדות: 4,538';
+  $('mtfSum').textContent='🟡 2/3 טווחים עולים — סיגנל בינוני לקנייה. נפט וגיאופוליטיקה תומכים, דולר לוחץ.';
+
+  // Demo signal
+  $('sigP').className='cd sig buy';
+  $('sTag').className='stag buy';$('sTag').textContent='🟢 קנייה!';
+  $('sReason').textContent='📌 MTF 2/3 ↑ · RSI<40 · MACD+ · EMA>SMA · קורלציות חיוביות · חדשות חיוביות';
+  $('sE').textContent='4,512.85';$('sSL').textContent='4,489.20';$('sTP').textContent='4,548.50';
+  $('strF').style.width='72%';$('strF').style.background='var(--green)';$('strP').textContent='72%';
+
+  // Demo indicators
+  const demoInds=[
+    {n:'RSI (14)',v:'38.4',s:'b',l:'קנייה',e:'מתחת 30 = מכור יתר, מעל 70 = קנוי יתר'},
+    {n:'MACD',v:'+2.340',s:'b',l:'קנייה',e:'קו מהיר מעל האיטי = מומנטום חיובי'},
+    {n:'Stochastic',v:'42.1',s:'n',l:'ניטרלי',e:'מתחת 20 = קנייה, מעל 80 = מכירה'},
+    {n:'Bollinger',v:'4471–4538',s:'n',l:'באמצע',e:'תחתית = קנייה, ראש = מכירה'},
+    {n:'SMA 20',v:'4,498.30',s:'b',l:'מעל',e:'מחיר מעל = מגמה עולה'},
+    {n:'SMA 50',v:'4,462.10',s:'b',l:'מעל',e:'ממוצע ארוך. מעל = מגמה חיובית יציבה'},
+    {n:'EMA 9',v:'4,505.70',s:'b',l:'חיובי',e:'מעל SMA = מגמה מתחזקת'},
+    {n:'ATR (14)',v:'11.82',s:'n',l:'רגוע',e:'תנודתיות. קובע SL ו-TP'}
+  ];
+  $('indL').innerHTML=demoInds.map(i=>`<div class="ind-r" onclick="this.classList.toggle('open')"><div class="ind-m"><span class="ind-n">${i.n}</span><span class="ind-v">${i.v}</span><span class="chip ${i.s}">${i.l}</span></div><div class="ind-e">${i.e}</div></div>`).join('');
+
+  // Demo history
+  $('hL').innerHTML=`
+    <div class="hi"><span class="ht buy">קנייה</span><span class="hp">4,512.85</span><span class="hrr">R:R 1.5</span><span class="htm">14:32</span></div>
+    <div class="hi"><span class="ht sell">מכירה</span><span class="hp">4,498.20</span><span class="hrr">R:R 1.8</span><span class="htm">13:47</span></div>
+    <div class="hi"><span class="ht buy">קנייה</span><span class="hp">4,476.50</span><span class="hrr">R:R 2.1</span><span class="htm">12:15</span></div>
+  `;
+
+  // Demo status
+  $('dot').className='dot on';
+  $('stLbl').textContent='תצוגה מקדימה — לחצי התחבר לנתונים חיים';
+}
+</script>
+</body>
+</html>
